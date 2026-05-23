@@ -44,9 +44,10 @@ else:
 @st.cache_resource
 def load_models():
     """Load all three models"""
-    speech_model = load_speech_model("saved_models/advanced_speech_emotion_model.pth")
-    text_model = load_text_model("saved_models/text_emotion_model.pth")
-    fusion_model = load_fusion_model("saved_models/multimodal_fusion_model.pth")
+    root_dir = Path(__file__).parent.parent
+    speech_model = load_speech_model(str(root_dir / "saved_models/advanced_speech_emotion_model.pth"))
+    text_model = load_text_model(str(root_dir / "saved_models/text_emotion_model.pth"))
+    fusion_model = load_fusion_model(str(root_dir / "saved_models/multimodal_fusion_model.pth"))
     return speech_model, text_model, fusion_model
 
 try:
