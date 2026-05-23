@@ -10,6 +10,8 @@ import librosa.display
 import matplotlib.pyplot as plt
 import warnings
 import sys
+import os
+import gdown
 from pathlib import Path
 
 # Add parent directory to path
@@ -40,10 +42,31 @@ if css_path.exists():
 else:
     st.warning("style.css not found.")
 
+# DEPLOYMENT-SAFE DOWNLOAD LOGIC
+def download_models_if_missing():
+    root_dir = Path(__file__).parent.parent
+    save_dir = root_dir / "saved_models"
+    os.makedirs(str(save_dir), exist_ok=True)
+    
+    models_to_download = {
+        "advanced_speech_emotion_model.pth": "1Buwo3LwpQOmeQQgY6YKxoS_07Wy0lL9t",
+        "text_emotion_model.pth": "1RGBIAUj_a1QH_QPEc6wAGHXEMJcIJ78x",
+        "multimodal_fusion_model.pth": "1jPalnennhuU9h85cTxrEfCBNuCxdHHOp"
+    }
+    
+    for filename, file_id in models_to_download.items():
+        file_path = save_dir / filename
+        if not os.path.exists(str(file_path)):
+            with st.spinner(f"Downloading {filename} (this may take a while)..."):
+                url = f"https://drive.google.com/uc?id={file_id}"
+                gdown.download(url, str(file_path), quiet=False)
+
 # LOAD MODELS
 @st.cache_resource
 def load_models():
     """Load all three models"""
+    download_models_if_missing()
+    
     root_dir = Path(__file__).parent.parent
     speech_model = load_speech_model(str(root_dir / "saved_models/advanced_speech_emotion_model.pth"))
     text_model = load_text_model(str(root_dir / "saved_models/text_emotion_model.pth"))
