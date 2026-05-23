@@ -1,0 +1,16 @@
+TEXT MODEL CLASSIFICATION REPORT
+============================================================
+
+                   precision    recall  f1-score   support
+
+            angry     0.0000    0.0000    0.0000        60
+          disgust     0.0000    0.0000    0.0000        60
+             fear     0.0000    0.0000    0.0000        60
+            happy     0.0000    0.0000    0.0000        60
+          neutral     0.1353    0.8500    0.2334        60
+pleasant_surprise     0.1628    0.1167    0.1359        60
+              sad     0.0000    0.0000    0.0000        60
+
+         accuracy                         0.1381       420
+        macro avg     0.0426    0.1381    0.0528       420
+     weighted avg     0.0426    0.1381    0.0528       420

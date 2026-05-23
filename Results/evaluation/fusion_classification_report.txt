@@ -1,0 +1,16 @@
+FUSION MODEL CLASSIFICATION REPORT
+============================================================
+
+                   precision    recall  f1-score   support
+
+            angry     1.0000    1.0000    1.0000        60
+          disgust     1.0000    1.0000    1.0000        60
+             fear     1.0000    1.0000    1.0000        60
+            happy     1.0000    1.0000    1.0000        60
+          neutral     1.0000    1.0000    1.0000        60
+pleasant_surprise     1.0000    1.0000    1.0000        60
+              sad     1.0000    1.0000    1.0000        60
+
+         accuracy                         1.0000       420
+        macro avg     1.0000    1.0000    1.0000       420
+     weighted avg     1.0000    1.0000    1.0000       420

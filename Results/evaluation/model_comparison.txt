@@ -1,0 +1,7 @@
+MODEL COMPARISON TABLE
+================================================================================
+
+ Model Accuracy Precision Recall F1-Score Avg Confidence
+Speech   1.0000    1.0000 1.0000   1.0000         1.0000
+  Text   0.1381    0.0426 0.1381   0.0528         0.1484
+Fusion   1.0000    1.0000 1.0000   1.0000         1.0000
