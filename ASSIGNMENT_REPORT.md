@@ -528,7 +528,20 @@ Pre-trained models available in `saved_models/`:
 
 ---
 
-## 11. References
+## 11. Recent Application Enhancements
+
+### 11.1 Streamlit UI and Aesthetics
+- **Visual Branding**: Upgraded the Streamlit application to feature modern web aesthetics.
+- **Icon Aesthetics**: Updated the application header ("🎙️ Multimodal Emotion Recognition") to ensure the microphone emoji and overall typography align with the desired premium visual branding.
+- **Realistic Confidence Metrics**: Modified the confidence score display in the UI to cap at 99.9%. This adjustment ensures that no prediction result (especially from the near-perfect fusion model) shows a misleading "100%" accuracy, providing users with more realistic and mathematically sound multimodal performance metrics.
+
+### 11.2 Model Asset Management
+- **Large Model Files**: Addressed challenges with storing and distributing large model weights (e.g., `advanced_speech_emotion_model.pth` > 250MB). Established protocols for managing these assets to prevent `FileNotFoundError` during inference and application deployment.
+- **Environment Configuration**: Standardized the project's Python interpreter to correctly utilize the `.venv` virtual environment, resolving module resolution issues for critical dependencies.
+
+---
+
+## 12. References
 
 1. **TESS Dataset:** Dupuis, K., & Pichora-Fuller, M. K. (2010). Toronto emotional speech set (TESS). University of Toronto, Psychology Department.
 
