@@ -9,6 +9,11 @@ import librosa
 import librosa.display
 import matplotlib.pyplot as plt
 import warnings
+import sys
+from pathlib import Path
+
+# Add parent directory to path
+sys.path.append(str(Path(__file__).parent.parent))
 
 # Import inference modules
 from inference.speech_inference import load_speech_model, predict_speech_emotion
