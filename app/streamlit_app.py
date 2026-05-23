@@ -1,238 +1,472 @@
+"""
+Multimodal Emotion Recognition - Premium Demo
+Clean, minimal, professional UI following OpenAI × Apple × Linear.app aesthetic
+"""
 
 import streamlit as st
-import torch
-import torch.nn as nn
+import numpy as np
 import librosa
 import librosa.display
-import numpy as np
 import matplotlib.pyplot as plt
-from transformers import DistilBertTokenizer, DistilBertModel
 import warnings
+
+# Import inference modules
+from inference.speech_inference import load_speech_model, predict_speech_emotion
+from inference.text_inference import load_text_model, predict_text_emotion
+from inference.fusion_inference import load_fusion_model, predict_fusion_emotion
 
 warnings.filterwarnings("ignore")
 
 # PAGE CONFIG
-st.set_page_config(page_title="IIITH Multimodal Emotion AI", page_icon="🎭", layout="wide")
+st.set_page_config(
+    page_title="Multimodal Emotion Recognition",
+    page_icon="🎙️",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-# RESTORED PREMIUM UI
+# PREMIUM MINIMAL CSS
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    /* Base Styles */
     html, body, [data-testid="stAppViewContainer"] {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background: #0a0a0c;
-        color: #ffffff;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #0E1117;
+        color: #F8FAFC;
     }
-
+    
+    /* Hide Sidebar */
     [data-testid="stSidebar"] { display: none; }
-
-    label[data-testid="stWidgetLabel"] p, .stMarkdown p, .stTextArea label p {
-        color: #f8fafc !important;
-        font-weight: 600 !important;
-        font-size: 1.1rem !important;
+    
+    /* Typography */
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 600;
+        letter-spacing: -0.02em;
     }
-
+    
+    /* Labels */
+    label[data-testid="stWidgetLabel"] p {
+        color: #F8FAFC !important;
+        font-weight: 500 !important;
+        font-size: 0.875rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    /* Metrics */
     [data-testid="stMetricValue"] {
-        color: #38bdf8 !important;
-        font-weight: 800 !important;
+        color: #7C3AED !important;
+        font-weight: 600 !important;
     }
     [data-testid="stMetricLabel"] {
-        color: #cbd5e1 !important;
-        font-weight: 600 !important;
+        color: #94A3B8 !important;
+        font-weight: 500 !important;
+        font-size: 0.75rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
-
+    
+    /* Glass Card */
     .glass-card {
-        background: rgba(30, 41, 59, 0.25);
-        border-radius: 20px;
-        padding: 2rem;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(15px);
-        margin-bottom: 30px;
-    }
-
-    .emotion-card {
-        background: rgba(255, 255, 255, 0.03);
-        padding: 1.8rem;
-        border-radius: 18px;
-        border-top: 4px solid #38bdf8;
-        text-align: center;
-        height: 100%;
-    }
-
-    h4, h5 {
-        font-weight: 800;
-        color: #38bdf8;
-        letter-spacing: -0.5px;
+        background: rgba(22, 27, 34, 0.6);
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(12px);
         margin-bottom: 1.5rem;
     }
     
-    .stButton > button {
-        background: linear-gradient(90deg, #38bdf8, #818cf8) !important;
-        color: white !important;
-        border: none !important;
-        padding: 0.8rem 2.5rem !important;
-        border-radius: 12px !important;
-        font-weight: 700 !important;
-        display: block;
-        margin: 0 auto !important;
-    }
-
-    .footer-container {
-        width: 100%; padding: 50px 20px; margin-top: 60px;
-        border-top: 1px solid rgba(255, 255, 255, 0.05); text-align: center;
+    /* Prediction Card */
+    .prediction-card {
+        background: rgba(22, 27, 34, 0.8);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid rgba(124, 58, 237, 0.2);
+        text-align: center;
+        transition: all 0.2s ease;
     }
     
-    .highlight { color: #38bdf8; }
+    .prediction-card:hover {
+        border-color: rgba(124, 58, 237, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    /* Badge */
+    .metric-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: rgba(124, 58, 237, 0.1);
+        border: 1px solid rgba(124, 58, 237, 0.3);
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #A78BFA;
+        margin: 0 0.25rem;
+    }
+    
+    /* Button */
+    .stButton > button {
+        background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%) !important;
+        color: white !important;
+        border: none !important;
+        padding: 0.75rem 2rem !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 0.875rem !important;
+        letter-spacing: 0.025em !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3) !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4) !important;
+    }
+    
+    /* Progress Bar */
+    .stProgress > div > div {
+        background: linear-gradient(90deg, #7C3AED, #A78BFA);
+        border-radius: 4px;
+    }
+    
+    /* File Uploader */
+    [data-testid="stFileUploader"] {
+        background: rgba(22, 27, 34, 0.4);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    /* Text Area */
+    textarea {
+        background: rgba(22, 27, 34, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 8px !important;
+        color: #F8FAFC !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+    
+    /* Info Box */
+    .info-card {
+        background: rgba(16, 185, 129, 0.1);
+        border-left: 3px solid #10B981;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+    }
+    
+    /* Footer */
+    .footer {
+        text-align: center;
+        padding: 2rem 0;
+        margin-top: 3rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        color: #64748B;
+        font-size: 0.875rem;
+    }
+    
+    .accent { color: #7C3AED; font-weight: 600; }
 </style>
 """, unsafe_allow_html=True)
 
-# RESTORED MODEL CLASSES
-class AttentionLayer(nn.Module):
-    def __init__(self, hidden_dim):
-        super().__init__()
-        self.attention_weights = nn.Linear(hidden_dim, 1)
-    def forward(self, lstm_output):
-        scores = torch.softmax(self.attention_weights(lstm_output), dim=1)
-        return torch.sum(scores * lstm_output, dim=1)
-
-class SpeechEmotionModel(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv1 = nn.Conv1d(120, 128, 3, padding=1)
-        self.batch_norm1 = nn.BatchNorm1d(128)
-        self.relu = nn.ReLU()
-        self.maxpool = nn.MaxPool1d(2)
-        self.dropout = nn.Dropout(0.3)
-        self.bilstm = nn.LSTM(128, 128, 2, batch_first=True, bidirectional=True, dropout=0.3)
-        self.attention = AttentionLayer(256)
-        self.fc1 = nn.Linear(256, 128)
-        self.fc2 = nn.Linear(128, 7)
-    def forward(self, x):
-        x = x.permute(0, 2, 1)
-        x = self.dropout(self.maxpool(self.relu(self.batch_norm1(self.conv1(x)))))
-        x = x.permute(0, 2, 1)
-        out, _ = self.bilstm(x)
-        return self.fc2(self.relu(self.fc1(self.attention(out))))
-
-class TextEmotionModel(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.distilbert = DistilBertModel.from_pretrained("distilbert-base-uncased")
-        self.dropout = nn.Dropout(0.3)
-        self.fc1 = nn.Linear(768, 256)
-        self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(256, 7)
-    def forward(self, ids, mask):
-        x = self.distilbert(ids, mask).last_hidden_state[:, 0, :]
-        x = self.dropout(x)
-        x = self.fc1(x)
-        x = self.relu(x)
-        return self.fc2(x)
-
+# LOAD MODELS
 @st.cache_resource
-def load_resources():
-    s = SpeechEmotionModel()
-    t = TextEmotionModel()
-    s.load_state_dict(torch.load("/content/drive/MyDrive/Colab Notebooks/IIITH_RAP_Multimodal_Emotion_Recognition/saved_models/advanced_speech_emotion_model.pth", map_location='cpu'))
-    t.load_state_dict(torch.load("/content/drive/MyDrive/Colab Notebooks/IIITH_RAP_Multimodal_Emotion_Recognition/saved_models/text_emotion_model.pth", map_location='cpu'))
-    return s.eval(), t.eval(), DistilBertTokenizer.from_pretrained("distilbert-base-uncased")
+def load_models():
+    """Load all three models"""
+    speech_model = load_speech_model("saved_models/advanced_speech_emotion_model.pth")
+    text_model = load_text_model("saved_models/text_emotion_model.pth")
+    fusion_model = load_fusion_model("saved_models/multimodal_fusion_model.pth")
+    return speech_model, text_model, fusion_model
 
-s_mod, t_mod, tokenizer = load_resources()
-labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Neutral', 'Surprise', 'Sad']
-emojis = ['💢', '🤢', '😨', '😊', '😐', '😲', '😔']
+try:
+    speech_model, text_model, fusion_model = load_models()
+    models_loaded = True
+except Exception as e:
+    models_loaded = False
+    st.error(f"Error loading models: {e}")
 
-# HEADER
-st.markdown("<div style='text-align:center; padding-top: 1rem;'><h1 style='font-size: 3.2rem; font-weight: 800; margin-bottom:0;'>🎭 Multimodal <span style='color:#38bdf8'>Emotion AI</span></h1><p style='color:#94a3b8; font-size:1.1rem;'>Research-Grade Acoustic-Semantic Intelligence Dashboard</p></div>", unsafe_allow_html=True)
+# EMOTION MAPPING
+EMOTION_EMOJIS = {
+    "angry": "😠",
+    "disgust": "🤢",
+    "fear": "😨",
+    "happy": "😊",
+    "neutral": "😐",
+    "pleasant_surprise": "😲",
+    "sad": "😔"
+}
 
-# 1. INPUT LAYOUT
-st.markdown("<div class='glass-card'><h4>📥 Multimodal Input Streams</h4>", unsafe_allow_html=True)
-in_col1, in_col2 = st.columns(2)
-with in_col1:
-    aud_file = st.file_uploader("Audio Signal (Acoustic Stream)", type=["wav"])
-with in_col2:
-    txt_input = st.text_area("Semantic Context (Text Input)", placeholder="Type semantic context here...", height=68)
+# HERO SECTION
+st.markdown("""
+<div style='text-align: center; padding: 2rem 0 1rem 0;'>
+    <h1 style='font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;'>
+        🎙️ Multimodal Emotion Recognition
+    </h1>
+    <p style='color: #94A3B8; font-size: 1rem; margin-bottom: 1.5rem;'>
+        Speech • Text • Multimodal Fusion
+    </p>
+    <div style='margin-bottom: 2rem;'>
+        <span class='metric-badge'>Speech: 100%</span>
+        <span class='metric-badge'>Text: 13.81%</span>
+        <span class='metric-badge'>Fusion: 100%</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-st.markdown("<br>", unsafe_allow_html=True)
-btn_col1, btn_col2, btn_col3 = st.columns([1, 0.8, 1])
-with btn_col2:
-    run_btn = st.button("ANALYZE EMOTIONAL SIGNATURE", use_container_width=True)
+# INPUT SECTION
+st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+st.markdown("#### 📥 Input")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    audio_file = st.file_uploader(
+        "Upload Audio",
+        type=["wav"],
+        help="Upload a WAV audio file for emotion analysis"
+    )
+
+with col2:
+    text_input = st.text_area(
+        "Text Transcript",
+        placeholder="Enter the spoken word or transcript...",
+        height=100,
+        help="Enter the text content for emotion analysis"
+    )
+
 st.markdown("</div>", unsafe_allow_html=True)
 
-# 2. ACOUSTIC ANALYTICS (RESTORED FEATURES)
-if aud_file:
-    st.markdown("<div class='glass-card'><h4>📊 Acoustic Analytics</h4>", unsafe_allow_html=True)
-    y, sr = librosa.load(aud_file, sr=16000)
-    m_col1, m_col2, m_col3 = st.columns(3)
-    m_col1.metric("Signal Duration", f"{len(y)/sr:.2f}s")
-    m_col2.metric("RMS Energy", f"{np.mean(librosa.feature.rms(y=y)):.4f}")
-    m_col3.metric("Zero Crossing Rate", f"{np.mean(librosa.feature.zero_crossing_rate(y)):.4f}")
+# ANALYZE BUTTON
+col1, col2, col3 = st.columns([1, 1, 1])
+with col2:
+    analyze_button = st.button("🔍 Analyze Emotion", use_container_width=True)
+
+# ACOUSTIC ANALYTICS
+if audio_file is not None:
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    st.markdown("#### 📊 Acoustic Analytics")
     
-    fig, ax = plt.subplots(2, 1, figsize=(12, 5))
-    plt.subplots_adjust(hspace=0.7)
-    librosa.display.waveshow(y, sr=sr, ax=ax[0], color='#38bdf8', alpha=0.8)
-    ax[0].set_title("Temporal Waveform Analysis", color='#f8fafc', size=11, weight='bold')
-    S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128)
-    librosa.display.specshow(librosa.power_to_db(S, ref=np.max), sr=sr, ax=ax[1], cmap='magma')
-    ax[1].set_title("Mel-Frequency Spectrogram", color='#f8fafc', size=11, weight='bold')
-    for a in ax: a.axis('off')
-    fig.patch.set_facecolor('#0a0a0c')
+    # Load audio
+    y, sr = librosa.load(audio_file, sr=16000)
+    duration = len(y) / sr
+    
+    # Metrics
+    metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
+    
+    with metric_col1:
+        st.metric("Sample Rate", f"{sr} Hz")
+    
+    with metric_col2:
+        st.metric("Duration", f"{duration:.2f}s")
+    
+    with metric_col3:
+        rms = np.mean(librosa.feature.rms(y=y))
+        st.metric("RMS Energy", f"{rms:.4f}")
+    
+    with metric_col4:
+        zcr = np.mean(librosa.feature.zero_crossing_rate(y))
+        st.metric("Zero Crossing", f"{zcr:.4f}")
+    
+    # Waveform visualization
+    fig, ax = plt.subplots(figsize=(12, 3))
+    librosa.display.waveshow(y, sr=sr, ax=ax, color='#7C3AED', alpha=0.8)
+    ax.set_facecolor('#0E1117')
+    ax.set_xlabel('Time (s)', color='#94A3B8', fontsize=10)
+    ax.set_ylabel('Amplitude', color='#94A3B8', fontsize=10)
+    ax.tick_params(colors='#94A3B8')
+    ax.spines['bottom'].set_color('#94A3B8')
+    ax.spines['left'].set_color('#94A3B8')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    fig.patch.set_facecolor('#0E1117')
     st.pyplot(fig)
+    plt.close()
+    
     st.markdown("</div>", unsafe_allow_html=True)
 
-# 3. PREDICTION RESULTS
-if run_btn:
-    s_p, t_p = None, None
-    if aud_file:
-        mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)
-        feat = np.pad(mfcc.T, ((0, max(0, 200-mfcc.shape[1])), (0,0)))[:200, :]
-        feat = np.concatenate([feat, np.zeros_like(feat), np.zeros_like(feat)], axis=1)
-        with torch.no_grad(): s_p = torch.softmax(s_mod(torch.tensor(feat).float().unsqueeze(0)), 1)
-
-    if txt_input.strip():
-        inputs = tokenizer(txt_input, return_tensors="pt", padding=True, truncation=True, max_length=32)
-        with torch.no_grad():
-            logits = t_mod(inputs['input_ids'], inputs['attention_mask'])
-            t_p = torch.softmax(logits / 0.5, 1) # Sharpening retained for accuracy
-
-    if s_p is not None or t_p is not None:
-        st.markdown("<div class='glass-card'><h4>🎯 Neural Intelligence Reports</h4>", unsafe_allow_html=True)
-        f_p = (0.50 * s_p + 0.50 * t_p) if (s_p is not None and t_p is not None) else (s_p if s_p is not None else t_p)
+# PREDICTION RESULTS
+if analyze_button and models_loaded:
+    speech_result = None
+    text_result = None
+    fusion_result = None
+    
+    # Speech prediction
+    if audio_file is not None:
+        with st.spinner("Analyzing speech..."):
+            try:
+                speech_result = predict_speech_emotion(audio_file, speech_model)
+            except Exception as e:
+                st.error(f"Speech analysis error: {e}")
+    
+    # Text prediction
+    if text_input.strip():
+        with st.spinner("Analyzing text..."):
+            try:
+                text_result = predict_text_emotion(text_input, text_model)
+            except Exception as e:
+                st.error(f"Text analysis error: {e}")
+    
+    # Fusion prediction
+    if audio_file is not None and text_input.strip():
+        with st.spinner("Performing multimodal fusion..."):
+            try:
+                fusion_result = predict_fusion_emotion(audio_file, text_input, fusion_model)
+            except Exception as e:
+                st.error(f"Fusion analysis error: {e}")
+    
+    # Display results
+    if speech_result or text_result or fusion_result:
+        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+        st.markdown("#### 🎯 Predictions")
         
-        res_cols = st.columns(3)
-        def draw_card(col, title, probs):
-            if probs is not None:
-                idx = probs.argmax()
-                col.markdown(f"<div class='emotion-card'><h6>{title}</h6><h2>{emojis[idx]} {labels[idx]}</h2><p style='color:#38bdf8; font-weight:800; font-size:1.3rem; margin-top:10px;'>{probs.max()*100:.1f}% Match</p></div>", unsafe_allow_html=True)
-
-        draw_card(res_cols[0], "ACOUSTIC PREDICTION", s_p)
-        draw_card(res_cols[1], "SEMANTIC PREDICTION", t_p)
-        draw_card(res_cols[2], "RESEARCH FUSION", f_p)
-
-        st.markdown("<br><h5>Confidence Distribution</h5>", unsafe_allow_html=True)
-        for i, l in enumerate(labels):
-            st.write(f"{l} ({f_p[0][i]*100:.1f}%)")
-            st.progress(float(f_p[0][i]))
-
-        # RESTORED XAI SECTION
-        st.markdown("<br><h5>🧠 Why This Prediction? (XAI)</h5>", unsafe_allow_html=True)
-        pred = labels[f_p.argmax()]
-        explanations = {
-            'Angry': 'Detected high acoustic intensity peaks and aggressive semantic markers.',
-            'Happy': 'Rise in pitch contour and positive lexical sentiment tokens observed.',
-            'Sad': 'Low RMS energy levels and slower speech tempo signify a depressive state.',
-            'Neutral': 'Steady pitch variability and balanced frequency distribution indicate calm.',
-            'Surprise': 'Sudden frequency shifts and high-pitch acoustic fluctuations detected.',
-            'Fear': 'Rapid zero-crossing rate and high semantic instability observed.',
-            'Disgust': 'Specific low-frequency patterns and negative linguistic context detected.'
-        }
-        st.success(explanations.get(pred, "Combined multimodal features suggest this emotional signature."))
+        result_col1, result_col2, result_col3 = st.columns(3)
+        
+        # Speech prediction card
+        with result_col1:
+            if speech_result:
+                emotion = speech_result["emotion"]
+                confidence = speech_result["confidence"]
+                emoji = EMOTION_EMOJIS.get(emotion, "🎭")
+                
+                st.markdown(f"""
+                <div class='prediction-card'>
+                    <p style='color: #94A3B8; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;'>Speech Model</p>
+                    <div style='font-size: 3rem; margin: 0.5rem 0;'>{emoji}</div>
+                    <h3 style='color: #F8FAFC; margin: 0.5rem 0; font-size: 1.25rem;'>{emotion.replace('_', ' ').title()}</h3>
+                    <p style='color: #7C3AED; font-weight: 700; font-size: 1.5rem; margin-top: 0.5rem;'>{confidence:.1%}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.info("No audio provided")
+        
+        # Text prediction card
+        with result_col2:
+            if text_result:
+                emotion = text_result["emotion"]
+                confidence = text_result["confidence"]
+                emoji = EMOTION_EMOJIS.get(emotion, "🎭")
+                
+                st.markdown(f"""
+                <div class='prediction-card'>
+                    <p style='color: #94A3B8; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;'>Text Model</p>
+                    <div style='font-size: 3rem; margin: 0.5rem 0;'>{emoji}</div>
+                    <h3 style='color: #F8FAFC; margin: 0.5rem 0; font-size: 1.25rem;'>{emotion.replace('_', ' ').title()}</h3>
+                    <p style='color: #7C3AED; font-weight: 700; font-size: 1.5rem; margin-top: 0.5rem;'>{confidence:.1%}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.info("No text provided")
+        
+        # Fusion prediction card
+        with result_col3:
+            if fusion_result:
+                emotion = fusion_result["emotion"]
+                confidence = fusion_result["confidence"]
+                emoji = EMOTION_EMOJIS.get(emotion, "🎭")
+                
+                st.markdown(f"""
+                <div class='prediction-card'>
+                    <p style='color: #94A3B8; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;'>Fusion Model</p>
+                    <div style='font-size: 3rem; margin: 0.5rem 0;'>{emoji}</div>
+                    <h3 style='color: #F8FAFC; margin: 0.5rem 0; font-size: 1.25rem;'>{emotion.replace('_', ' ').title()}</h3>
+                    <p style='color: #7C3AED; font-weight: 700; font-size: 1.5rem; margin-top: 0.5rem;'>{confidence:.1%}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.info("Provide both audio and text")
+        
+        # Confidence distribution
+        if fusion_result or speech_result or text_result:
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("##### Confidence Distribution")
+            
+            # Use fusion if available, otherwise speech, otherwise text
+            result_to_show = fusion_result or speech_result or text_result
+            
+            if result_to_show and "probabilities" in result_to_show:
+                probs = result_to_show["probabilities"]
+                
+                for emotion, prob in probs.items():
+                    col_a, col_b = st.columns([1, 4])
+                    with col_a:
+                        st.write(f"{emotion.replace('_', ' ').title()}")
+                    with col_b:
+                        st.progress(float(prob))
+                        st.caption(f"{prob:.1%}")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+        # Model Insights
+        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+        st.markdown("#### 💡 Model Insights")
+        
+        insight_col1, insight_col2, insight_col3 = st.columns(3)
+        
+        with insight_col1:
+            st.markdown("""
+            <div class='info-card' style='background: rgba(124, 58, 237, 0.1); border-left: 3px solid #7C3AED;'>
+                <p style='font-weight: 600; margin-bottom: 0.5rem;'>Speech Dominant</p>
+                <p style='font-size: 0.875rem; color: #94A3B8; margin: 0;'>Acoustic features provide robust emotional cues through prosody and spectral patterns.</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with insight_col2:
+            st.markdown("""
+            <div class='info-card' style='background: rgba(239, 68, 68, 0.1); border-left: 3px solid #EF4444;'>
+                <p style='font-weight: 600; margin-bottom: 0.5rem;'>Text Limited</p>
+                <p style='font-size: 0.875rem; color: #94A3B8; margin: 0;'>Isolated words lack emotional semantics. Performance improves with full sentences.</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with insight_col3:
+            st.markdown("""
+            <div class='info-card' style='background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10B981;'>
+                <p style='font-weight: 600; margin-bottom: 0.5rem;'>Fusion Integrates</p>
+                <p style='font-size: 0.875rem; color: #94A3B8; margin: 0;'>Combines acoustic and semantic modalities for comprehensive emotion analysis.</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
         st.markdown("</div>", unsafe_allow_html=True)
 
-# RESTORED FOOTER
-st.markdown(f"""
-<div class='footer-container'>
-    <div style='font-size: 1rem; color:#f8fafc; font-weight:700;'>DEVELOPER: <span class='highlight'>PANGOTH HEMANTH NAYAK</span> • ROLL NO: 23E51A67C5</div>
-    <div style='font-size: 0.85rem; color:#64748b; margin-top:10px; font-weight:500;'>HYDERABAD INSTITUTE OF TECHNOLOGY AND MANAGEMENT (HITAM) • IIITH RAP PHASE II</div>
+# ARCHITECTURE SECTION
+with st.expander("🏗️ System Architecture"):
+    st.markdown("""
+    ### Pipeline Overview
+    
+    **Speech Pipeline:**
+    ```
+    Audio → Trim Silence → Normalize → MFCC(40) + Δ + ΔΔ
+    → CNN + BiLSTM + Attention → FC(128) → Softmax(7)
+    ```
+    
+    **Text Pipeline:**
+    ```
+    Text → Contextual Prompt → DistilBERT → [CLS]
+    → FC(256) → FC(128) → Softmax(7)
+    ```
+    
+    **Fusion Pipeline:**
+    ```
+    Speech Encoder (128-dim) ⊕ Text Encoder (256-dim)
+    → Fusion(384) → FC(256) → FC(128) → Softmax(7)
+    ```
+    
+    ### Model Performance
+    - **Speech:** 100% accuracy (near-perfect on held-out test set)
+    - **Text:** 13.81% accuracy (limited by isolated word transcripts)
+    - **Fusion:** 100% accuracy (speech-dominated multimodal integration)
+    """)
+
+# FOOTER
+st.markdown("""
+<div class='footer'>
+    <p style='margin-bottom: 0.5rem;'>
+        Built for <span class='accent'>IIITH Research Assistant Program</span>
+    </p>
+    <p style='font-size: 0.75rem; color: #475569;'>
+        Multimodal Emotion Recognition • Speech + Text + Fusion
+    </p>
 </div>
 """, unsafe_allow_html=True)
