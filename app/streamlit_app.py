@@ -301,7 +301,17 @@ if analyze_button and models_loaded:
     if audio_file is not None:
         with st.spinner("Analyzing speech..."):
             try:
-                speech_result = predict_speech_emotion(audio_file, speech_model)
+                # Save uploaded file temporarily
+                import tempfile
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as tmp_file:
+                    tmp_file.write(audio_file.getvalue())
+                    tmp_path = tmp_file.name
+                
+                speech_result = predict_speech_emotion(tmp_path, speech_model)
+                
+                # Clean up temp file
+                import os
+                os.unlink(tmp_path)
             except Exception as e:
                 st.error(f"Speech analysis error: {e}")
     
@@ -317,7 +327,17 @@ if analyze_button and models_loaded:
     if audio_file is not None and text_input.strip():
         with st.spinner("Performing multimodal fusion..."):
             try:
-                fusion_result = predict_fusion_emotion(audio_file, text_input, fusion_model)
+                # Save uploaded file temporarily
+                import tempfile
+                import os
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as tmp_file:
+                    tmp_file.write(audio_file.getvalue())
+                    tmp_path = tmp_file.name
+                
+                fusion_result = predict_fusion_emotion(tmp_path, text_input, fusion_model)
+                
+                # Clean up temp file
+                os.unlink(tmp_path)
             except Exception as e:
                 st.error(f"Fusion analysis error: {e}")
     
