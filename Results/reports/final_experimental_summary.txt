@@ -1,0 +1,13 @@
+
+FINAL EXPERIMENTAL OBSERVATIONS
+
+Speech-Only Model:
+The speech modality achieved extremely strong performance due to rich acoustic emotional information present within the TESS dataset.
+
+Text-Only Model:
+The text modality achieved limited performance because the transcripts primarily consist of isolated lexical tokens without emotionally descriptive semantic context.
+
+Multimodal Fusion Model:
+The fusion architecture successfully integrated acoustic and semantic representations into unified emotional embeddings, achieving robust multimodal emotional classification.
+
+The results highlight the dominance of acoustic emotional cues while also demonstrating the complementary role of multimodal fusion learning.
