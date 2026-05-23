@@ -1,0 +1,150 @@
+"""
+HTML templates for the Streamlit Multimodal Emotion Recognition app.
+Extracted to a separate file to prevent linter false-positives from inline HTML/CSS.
+"""
+
+HERO_SECTION = (
+    "<div style='text-align: center; padding: 4rem 0 2rem 0; animation: fadeInDown 1s ease-out;'>"
+    "<h1 style='font-size: 4rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.05em; background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0px 4px 15px rgba(245, 158, 11, 0.4));'>"
+    "🎙️ Multimodal Emotion Recognition"
+    "</h1>"
+    "<p style='color: #E2E8F0; font-size: 1.35rem; font-weight: 600; margin-bottom: 2.5rem; letter-spacing: 0.08em; text-transform: uppercase;'>"
+    "Speech &nbsp;·&nbsp; Text &nbsp;·&nbsp; Multimodal Fusion"
+    "</p>"
+    "<div style='margin-bottom: 2rem; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;'>"
+    "<span class='metric-badge' style='font-size: 1rem; padding: 0.6rem 1.8rem; box-shadow: 0 4px 15px rgba(245,158,11,0.2);'>Speech: 100%</span>"
+    "<span class='metric-badge' style='font-size: 1rem; padding: 0.6rem 1.8rem; box-shadow: 0 4px 15px rgba(245,158,11,0.2);'>Text: 13.81%</span>"
+    "<span class='metric-badge' style='font-size: 1rem; padding: 0.6rem 1.8rem; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.5); color: #34D399; box-shadow: 0 4px 15px rgba(16,185,129,0.3);'>Fusion: 100%</span>"
+    "</div>"
+    "</div>"
+)
+
+SPEECH_INSIGHT = (
+    "<div class='info-card-warning' style='box-shadow: 0 4px 20px rgba(245,158,11,0.1);'>"
+    "<p style='font-weight: 800; margin-bottom: 0.5rem; color: #FBBF24; font-size: 1.15rem; letter-spacing: 0.03em;'>Speech Dominant</p>"
+    "<p style='font-size: 0.95rem; color: #E2E8F0; margin: 0; line-height: 1.6; font-weight: 500;'>"
+    "Acoustic features provide robust emotional cues through prosody and spectral patterns.</p>"
+    "</div>"
+)
+
+TEXT_INSIGHT = (
+    "<div class='info-card-warning' style='border-left-color: #EF4444; background: rgba(239, 68, 68, 0.08); box-shadow: 0 4px 20px rgba(239,68,68,0.1);'>"
+    "<p style='font-weight: 800; margin-bottom: 0.5rem; color: #F87171; font-size: 1.15rem; letter-spacing: 0.03em;'>Text Limited</p>"
+    "<p style='font-size: 0.95rem; color: #E2E8F0; margin: 0; line-height: 1.6; font-weight: 500;'>"
+    "Isolated words lack emotional semantics. Performance improves significantly with full sentences.</p>"
+    "</div>"
+)
+
+FUSION_INSIGHT = (
+    "<div class='info-card' style='box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4);'>"
+    "<p style='font-weight: 800; margin-bottom: 0.5rem; color: #34D399; font-size: 1.15rem; letter-spacing: 0.03em;'>Fusion Integrates</p>"
+    "<p style='font-size: 0.95rem; color: #E2E8F0; margin: 0; line-height: 1.6; font-weight: 500;'>"
+    "Combines acoustic and semantic modalities for comprehensive, highly accurate emotion analysis.</p>"
+    "</div>"
+)
+
+ARCHITECTURE_SECTION = (
+    "<h3 style='font-size: 1.6rem; font-weight: 800; color: #FBBF24; margin-bottom: 1.5rem; border-bottom: 2px solid rgba(255,255,255,0.05); padding-bottom: 0.75rem;'>Pipeline Architecture Overview</h3>"
+    ""
+    "<p style='font-size: 1rem; font-weight: 800; color: #E2E8F0; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.15em;'>🎙️ Speech Emotion Pipeline</p>"
+    "<div class='flow-container'>"
+    "<span class='flow-step'>Audio Input</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step'>Trim Silence</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step'>Normalize</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step'>MFCC (40) + Δ + ΔΔ</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step accent-step' style='box-shadow: 0 0 15px rgba(16,185,129,0.3);'>CNN + BiLSTM + Attention</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step'>FC (128)</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step accent-step' style='box-shadow: 0 0 15px rgba(16,185,129,0.3);'>Softmax (7 Class)</span>"
+    "</div>"
+    ""
+    "<p style='font-size: 1rem; font-weight: 800; color: #E2E8F0; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.15em; margin-top: 2rem;'>📝 Text Emotion Pipeline</p>"
+    "<div class='flow-container'>"
+    "<span class='flow-step'>Text Transcript</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step'>Contextual Prompt</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step accent-step' style='box-shadow: 0 0 15px rgba(16,185,129,0.3);'>DistilBERT [CLS] Token</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step'>FC (256)</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step'>FC (128)</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step accent-step' style='box-shadow: 0 0 15px rgba(16,185,129,0.3);'>Softmax (7 Class)</span>"
+    "</div>"
+    ""
+    "<p style='font-size: 1rem; font-weight: 800; color: #E2E8F0; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.15em; margin-top: 2rem;'>🔮 Multimodal Fusion Pipeline</p>"
+    "<div class='flow-container'>"
+    "<span class='flow-step'>Speech Encoder (128-dim)</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step'>Text Encoder (256-dim)</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step accent-step' style='box-shadow: 0 0 15px rgba(16,185,129,0.3);'>Multimodal Concat (384-dim)</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step'>FC (256)</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step'>FC (128)</span>"
+    "<span class='flow-arrow'>➔</span>"
+    "<span class='flow-step accent-step' style='box-shadow: 0 0 15px rgba(16,185,129,0.3);'>Softmax (7 Class)</span>"
+    "</div>"
+    ""
+    "<h3 style='font-size: 1.6rem; font-weight: 800; color: #FBBF24; margin-top: 3rem; margin-bottom: 1.5rem; border-bottom: 2px solid rgba(255,255,255,0.05); padding-bottom: 0.75rem;'>Model Accuracy &amp; Performance</h3>"
+    "<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1rem;'>"
+    "<div style='background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); transition: transform 0.3s ease, box-shadow 0.3s ease;' onmouseover=\"this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 50px rgba(245, 158, 11, 0.2)'\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 40px rgba(0, 0, 0, 0.4)'\"> "
+    "<p style='font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.12em; color: #94A3B8; margin: 0 0 0.75rem 0; font-weight: 700;'>Speech Performance</p>"
+    "<h4 style='color: #FBBF24; margin: 0; font-size: 2.5rem; font-weight: 900; filter: drop-shadow(0 2px 10px rgba(245,158,11,0.3));'>100% Accuracy</h4>"
+    "<p style='font-size: 1rem; color: #CBD5E1; margin-top: 1rem; line-height: 1.6; font-weight: 500;'>Near-perfect classification on held-out speech test set, indicating robust acoustic feature extraction.</p>"
+    "</div>"
+    "<div style='background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); transition: transform 0.3s ease, box-shadow 0.3s ease;' onmouseover=\"this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 50px rgba(239, 68, 68, 0.2)'\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 40px rgba(0, 0, 0, 0.4)'\"> "
+    "<p style='font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.12em; color: #94A3B8; margin: 0 0 0.75rem 0; font-weight: 700;'>Text Performance</p>"
+    "<h4 style='color: #F87171; margin: 0; font-size: 2.5rem; font-weight: 900; filter: drop-shadow(0 2px 10px rgba(248,113,113,0.3));'>13.81% Accuracy</h4>"
+    "<p style='font-size: 1rem; color: #CBD5E1; margin-top: 1rem; line-height: 1.6; font-weight: 500;'>Constrained heavily by isolated single-word transcripts which lack structural or semantic context.</p>"
+    "</div>"
+    "<div style='background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.2); transition: transform 0.3s ease, box-shadow 0.3s ease;' onmouseover=\"this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 50px rgba(16, 185, 129, 0.35)'\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 40px rgba(16, 185, 129, 0.2)'\"> "
+    "<p style='font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.12em; color: #94A3B8; margin: 0 0 0.75rem 0; font-weight: 700;'>Multimodal Fusion</p>"
+    "<h4 style='color: #34D399; margin: 0; font-size: 2.5rem; font-weight: 900; filter: drop-shadow(0 2px 15px rgba(52,211,153,0.5));'>100% Accuracy</h4>"
+    "<p style='font-size: 1rem; color: #CBD5E1; margin-top: 1rem; line-height: 1.6; font-weight: 500;'>Speech-dominated multimodal integration, delivering absolute robustness across combined modalities.</p>"
+    "</div>"
+    "</div>"
+)
+
+FOOTER = (
+    "<div class='footer'>"
+    "<p class='footer-title'>Project Credits</p>"
+    "<p class='footer-name'>Name: Pangoth Hemanth Nayak</p>"
+    "<p class='footer-college'>Hyderabad Institute of Technology and Management</p>"
+    "<hr class='footer-divider'>"
+    "<p class='footer-internship'>IIITH RAP &nbsp;·&nbsp; Phase 2 Internship</p>"
+    "<p class='footer-tagline'>Multimodal Emotion Recognition &nbsp;·&nbsp; Speech + Text + Fusion</p>"
+    "</div>"
+)
+
+def prediction_card(emoji: str, emotion: str, confidence: float, model_name: str, is_fusion: bool = False) -> str:
+    """Generate a prediction card HTML string."""
+    border_style = "border-color: rgba(16, 185, 129, 0.5) !important; box-shadow: 0 12px 40px rgba(16, 185, 129, 0.25) !important;" if is_fusion else ""
+    conf_color = "#34D399" if is_fusion else "#FBBF24"
+    bg_style = "background: rgba(16, 185, 129, 0.08) !important;" if is_fusion else ""
+    
+    return (
+        f"<div class='prediction-card' style='{border_style} {bg_style}'>"
+        f"<p style='color: #94A3B8; font-size: 0.9rem; font-weight: 800; text-transform: uppercase; "
+        f"letter-spacing: 0.15em; margin-bottom: 0.5rem;'>{model_name}</p>"
+        f"<div style='font-size: 5rem; margin: 1.5rem 0; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.4)); animation: float 3s ease-in-out infinite;'>{emoji}</div>"
+        f"<h3 style='color: #F8FAFC; margin: 0.5rem 0; font-size: 1.8rem; font-weight: 900; letter-spacing: -0.02em;'>"
+        f"{emotion.replace('_', ' ').title()}</h3>"
+        f"<p style='color: {conf_color}; font-weight: 900; font-size: 2.2rem; margin: 0.5rem 0 0 0; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));'>"
+        f"{confidence:.1%}</p>"
+        "</div>"
+    )
+
+def confidence_label(emotion_name: str) -> str:
+    """Generate a confidence distribution label HTML string."""
+    return (
+        f"<p style='font-size: 1.05rem; font-weight: 700; color: #F8FAFC; "
+        f"margin: 0.25rem 0; text-transform: capitalize; letter-spacing: 0.02em;'>{emotion_name.replace('_', ' ')}</p>"
+    )

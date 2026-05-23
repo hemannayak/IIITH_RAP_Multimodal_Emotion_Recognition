@@ -20,6 +20,8 @@ from inference.speech_inference import load_speech_model, predict_speech_emotion
 from inference.text_inference import load_text_model, predict_text_emotion
 from inference.fusion_inference import load_fusion_model, predict_fusion_emotion
 
+from templates import HERO_SECTION, SPEECH_INSIGHT, TEXT_INSIGHT, FUSION_INSIGHT, ARCHITECTURE_SECTION, FOOTER, prediction_card
+
 warnings.filterwarnings("ignore")
 
 # PAGE CONFIG
@@ -31,150 +33,12 @@ st.set_page_config(
 )
 
 # PREMIUM MINIMAL CSS
-st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
-    /* Base Styles */
-    html, body, [data-testid="stAppViewContainer"] {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        background: #0E1117;
-        color: #F8FAFC;
-    }
-    
-    /* Hide Sidebar */
-    [data-testid="stSidebar"] { display: none; }
-    
-    /* Typography */
-    h1, h2, h3, h4, h5, h6 {
-        font-weight: 600;
-        letter-spacing: -0.02em;
-    }
-    
-    /* Labels */
-    label[data-testid="stWidgetLabel"] p {
-        color: #F8FAFC !important;
-        font-weight: 500 !important;
-        font-size: 0.875rem !important;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-    
-    /* Metrics */
-    [data-testid="stMetricValue"] {
-        color: #7C3AED !important;
-        font-weight: 600 !important;
-    }
-    [data-testid="stMetricLabel"] {
-        color: #94A3B8 !important;
-        font-weight: 500 !important;
-        font-size: 0.75rem !important;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-    
-    /* Glass Card */
-    .glass-card {
-        background: rgba(22, 27, 34, 0.6);
-        border-radius: 16px;
-        padding: 1.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        backdrop-filter: blur(12px);
-        margin-bottom: 1.5rem;
-    }
-    
-    /* Prediction Card */
-    .prediction-card {
-        background: rgba(22, 27, 34, 0.8);
-        padding: 1.5rem;
-        border-radius: 12px;
-        border: 1px solid rgba(124, 58, 237, 0.2);
-        text-align: center;
-        transition: all 0.2s ease;
-    }
-    
-    .prediction-card:hover {
-        border-color: rgba(124, 58, 237, 0.4);
-        transform: translateY(-2px);
-    }
-    
-    /* Badge */
-    .metric-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        background: rgba(124, 58, 237, 0.1);
-        border: 1px solid rgba(124, 58, 237, 0.3);
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: #A78BFA;
-        margin: 0 0.25rem;
-    }
-    
-    /* Button */
-    .stButton > button {
-        background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%) !important;
-        color: white !important;
-        border: none !important;
-        padding: 0.75rem 2rem !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        font-size: 0.875rem !important;
-        letter-spacing: 0.025em !important;
-        transition: all 0.2s ease !important;
-        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3) !important;
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-1px) !important;
-        box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4) !important;
-    }
-    
-    /* Progress Bar */
-    .stProgress > div > div {
-        background: linear-gradient(90deg, #7C3AED, #A78BFA);
-        border-radius: 4px;
-    }
-    
-    /* File Uploader */
-    [data-testid="stFileUploader"] {
-        background: rgba(22, 27, 34, 0.4);
-        border: 1px dashed rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        padding: 1rem;
-    }
-    
-    /* Text Area */
-    textarea {
-        background: rgba(22, 27, 34, 0.6) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 8px !important;
-        color: #F8FAFC !important;
-        font-family: 'Inter', sans-serif !important;
-    }
-    
-    /* Info Box */
-    .info-card {
-        background: rgba(16, 185, 129, 0.1);
-        border-left: 3px solid #10B981;
-        padding: 1rem;
-        border-radius: 8px;
-        margin: 1rem 0;
-    }
-    
-    /* Footer */
-    .footer {
-        text-align: center;
-        padding: 2rem 0;
-        margin-top: 3rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        color: #64748B;
-        font-size: 0.875rem;
-    }
-    
-    .accent { color: #7C3AED; font-weight: 600; }
-</style>
-""", unsafe_allow_html=True)
+css_path = Path(__file__).parent / "style.css"
+if css_path.exists():
+    with open(css_path) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+else:
+    st.warning("style.css not found.")
 
 # LOAD MODELS
 @st.cache_resource
@@ -204,21 +68,7 @@ EMOTION_EMOJIS = {
 }
 
 # HERO SECTION
-st.markdown("""
-<div style='text-align: center; padding: 2rem 0 1rem 0;'>
-    <h1 style='font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;'>
-        🎙️ Multimodal Emotion Recognition
-    </h1>
-    <p style='color: #94A3B8; font-size: 1rem; margin-bottom: 1.5rem;'>
-        Speech • Text • Multimodal Fusion
-    </p>
-    <div style='margin-bottom: 2rem;'>
-        <span class='metric-badge'>Speech: 100%</span>
-        <span class='metric-badge'>Text: 13.81%</span>
-        <span class='metric-badge'>Fusion: 100%</span>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+st.markdown(HERO_SECTION, unsafe_allow_html=True)
 
 # INPUT SECTION
 st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
@@ -276,16 +126,16 @@ if audio_file is not None:
     
     # Waveform visualization
     fig, ax = plt.subplots(figsize=(12, 3))
-    librosa.display.waveshow(y, sr=sr, ax=ax, color='#7C3AED', alpha=0.8)
-    ax.set_facecolor('#0E1117')
+    librosa.display.waveshow(y, sr=sr, ax=ax, color='#F59E0B', alpha=0.8)
+    ax.set_facecolor('none')
     ax.set_xlabel('Time (s)', color='#94A3B8', fontsize=10)
     ax.set_ylabel('Amplitude', color='#94A3B8', fontsize=10)
     ax.tick_params(colors='#94A3B8')
-    ax.spines['bottom'].set_color('#94A3B8')
-    ax.spines['left'].set_color('#94A3B8')
+    ax.spines['bottom'].set_color((1.0, 1.0, 1.0, 0.1))
+    ax.spines['left'].set_color((1.0, 1.0, 1.0, 0.1))
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    fig.patch.set_facecolor('#0E1117')
+    fig.patch.set_facecolor('none')
     st.pyplot(fig)
     plt.close()
     
@@ -355,14 +205,7 @@ if analyze_button and models_loaded:
                 confidence = speech_result["confidence"]
                 emoji = EMOTION_EMOJIS.get(emotion, "🎭")
                 
-                st.markdown(f"""
-                <div class='prediction-card'>
-                    <p style='color: #94A3B8; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;'>Speech Model</p>
-                    <div style='font-size: 3rem; margin: 0.5rem 0;'>{emoji}</div>
-                    <h3 style='color: #F8FAFC; margin: 0.5rem 0; font-size: 1.25rem;'>{emotion.replace('_', ' ').title()}</h3>
-                    <p style='color: #7C3AED; font-weight: 700; font-size: 1.5rem; margin-top: 0.5rem;'>{confidence:.1%}</p>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(prediction_card(emoji, emotion, confidence, "Speech Model"), unsafe_allow_html=True)
             else:
                 st.info("No audio provided")
         
@@ -373,14 +216,7 @@ if analyze_button and models_loaded:
                 confidence = text_result["confidence"]
                 emoji = EMOTION_EMOJIS.get(emotion, "🎭")
                 
-                st.markdown(f"""
-                <div class='prediction-card'>
-                    <p style='color: #94A3B8; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;'>Text Model</p>
-                    <div style='font-size: 3rem; margin: 0.5rem 0;'>{emoji}</div>
-                    <h3 style='color: #F8FAFC; margin: 0.5rem 0; font-size: 1.25rem;'>{emotion.replace('_', ' ').title()}</h3>
-                    <p style='color: #7C3AED; font-weight: 700; font-size: 1.5rem; margin-top: 0.5rem;'>{confidence:.1%}</p>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(prediction_card(emoji, emotion, confidence, "Text Model"), unsafe_allow_html=True)
             else:
                 st.info("No text provided")
         
@@ -391,14 +227,7 @@ if analyze_button and models_loaded:
                 confidence = fusion_result["confidence"]
                 emoji = EMOTION_EMOJIS.get(emotion, "🎭")
                 
-                st.markdown(f"""
-                <div class='prediction-card'>
-                    <p style='color: #94A3B8; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;'>Fusion Model</p>
-                    <div style='font-size: 3rem; margin: 0.5rem 0;'>{emoji}</div>
-                    <h3 style='color: #F8FAFC; margin: 0.5rem 0; font-size: 1.25rem;'>{emotion.replace('_', ' ').title()}</h3>
-                    <p style='color: #7C3AED; font-weight: 700; font-size: 1.5rem; margin-top: 0.5rem;'>{confidence:.1%}</p>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(prediction_card(emoji, emotion, confidence, "Fusion Model", is_fusion=True), unsafe_allow_html=True)
             else:
                 st.info("Provide both audio and text")
         
@@ -436,68 +265,19 @@ if analyze_button and models_loaded:
         insight_col1, insight_col2, insight_col3 = st.columns(3)
         
         with insight_col1:
-            st.markdown("""
-            <div class='info-card' style='background: rgba(124, 58, 237, 0.1); border-left: 3px solid #7C3AED;'>
-                <p style='font-weight: 600; margin-bottom: 0.5rem;'>Speech Dominant</p>
-                <p style='font-size: 0.875rem; color: #94A3B8; margin: 0;'>Acoustic features provide robust emotional cues through prosody and spectral patterns.</p>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(SPEECH_INSIGHT, unsafe_allow_html=True)
         
         with insight_col2:
-            st.markdown("""
-            <div class='info-card' style='background: rgba(239, 68, 68, 0.1); border-left: 3px solid #EF4444;'>
-                <p style='font-weight: 600; margin-bottom: 0.5rem;'>Text Limited</p>
-                <p style='font-size: 0.875rem; color: #94A3B8; margin: 0;'>Isolated words lack emotional semantics. Performance improves with full sentences.</p>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(TEXT_INSIGHT, unsafe_allow_html=True)
         
         with insight_col3:
-            st.markdown("""
-            <div class='info-card' style='background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10B981;'>
-                <p style='font-weight: 600; margin-bottom: 0.5rem;'>Fusion Integrates</p>
-                <p style='font-size: 0.875rem; color: #94A3B8; margin: 0;'>Combines acoustic and semantic modalities for comprehensive emotion analysis.</p>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(FUSION_INSIGHT, unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
 
 # ARCHITECTURE SECTION
 with st.expander("🏗️ System Architecture"):
-    st.markdown("""
-    ### Pipeline Overview
-    
-    **Speech Pipeline:**
-    ```
-    Audio → Trim Silence → Normalize → MFCC(40) + Δ + ΔΔ
-    → CNN + BiLSTM + Attention → FC(128) → Softmax(7)
-    ```
-    
-    **Text Pipeline:**
-    ```
-    Text → Contextual Prompt → DistilBERT → [CLS]
-    → FC(256) → FC(128) → Softmax(7)
-    ```
-    
-    **Fusion Pipeline:**
-    ```
-    Speech Encoder (128-dim) ⊕ Text Encoder (256-dim)
-    → Fusion(384) → FC(256) → FC(128) → Softmax(7)
-    ```
-    
-    ### Model Performance
-    - **Speech:** 100% accuracy (near-perfect on held-out test set)
-    - **Text:** 13.81% accuracy (limited by isolated word transcripts)
-    - **Fusion:** 100% accuracy (speech-dominated multimodal integration)
-    """)
+    st.markdown(ARCHITECTURE_SECTION, unsafe_allow_html=True)
 
 # FOOTER
-st.markdown("""
-<div class='footer'>
-    <p style='margin-bottom: 0.5rem;'>
-        Built for <span class='accent'>IIITH Research Assistant Program</span>
-    </p>
-    <p style='font-size: 0.75rem; color: #475569;'>
-        Multimodal Emotion Recognition • Speech + Text + Fusion
-    </p>
-</div>
-""", unsafe_allow_html=True)
+st.markdown(FOOTER, unsafe_allow_html=True)
