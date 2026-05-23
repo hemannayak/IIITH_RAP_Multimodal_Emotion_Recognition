@@ -1,45 +1,33 @@
 import librosa
-import numpy as np
+
+
+SAMPLE_RATE = 22050
 
 
 def load_audio(
-
-    file_path,
-
-    sample_rate=22050,
-
-    duration=3
+    file_path
 ):
     """
-    Load audio and standardize length.
+    Load and preprocess audio
     """
 
-    audio, sr = librosa.load(
+    signal, sample_rate = librosa.load(
 
         file_path,
 
-        sr=sample_rate
+        sr=SAMPLE_RATE
     )
 
-    # Trim silence
-    audio, _ = librosa.effects.trim(
-        audio
+    # Remove silence
+    signal, _ = librosa.effects.trim(
+
+        signal
     )
 
-    # Fixed length
-    target_length = sample_rate * duration
+    # Normalize raw signal
+    signal = librosa.util.normalize(
 
-    if len(audio) > target_length:
+        signal
+    )
 
-        audio = audio[:target_length]
-
-    else:
-
-        padding = target_length - len(audio)
-
-        audio = np.pad(
-            audio,
-            (0, padding)
-        )
-
-    return audio
+    return signal

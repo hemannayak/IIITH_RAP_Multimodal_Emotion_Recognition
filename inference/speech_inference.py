@@ -96,7 +96,7 @@ def predict_speech_emotion(
 
     with torch.no_grad():
 
-        logits = model(
+        logits, embedding = model(
             features
         )
 

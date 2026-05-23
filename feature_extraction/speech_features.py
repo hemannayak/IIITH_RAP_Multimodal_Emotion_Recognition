@@ -2,56 +2,76 @@ import librosa
 import numpy as np
 
 
+N_MFCC = 40
+MAX_PAD_LENGTH = 200
+
+
 def extract_mfcc(
-
-    audio,
-
-    sample_rate=22050,
-
-    n_mfcc=120,
-
-    max_length=120
+    signal,
+    sample_rate=22050
 ):
     """
-    Extract MFCC features
+    Match training feature extraction EXACTLY
     """
 
+    # MFCC
     mfcc = librosa.feature.mfcc(
 
-        y=audio,
+        y=signal,
 
         sr=sample_rate,
 
-        n_mfcc=n_mfcc
+        n_mfcc=N_MFCC
     )
 
-    # Normalize
-    mfcc = (mfcc - np.mean(mfcc)) / (
-        np.std(mfcc) + 1e-8
+    # Delta
+    delta_mfcc = librosa.feature.delta(
+
+        mfcc
     )
 
-    # Pad / truncate
-    if mfcc.shape[1] < max_length:
+    # Delta²
+    delta2_mfcc = librosa.feature.delta(
+
+        mfcc,
+
+        order=2
+    )
+
+    # Combine features
+    combined_features = np.vstack([
+
+        mfcc,
+
+        delta_mfcc,
+
+        delta2_mfcc
+    ])
+
+    # Padding / truncation
+    if combined_features.shape[1] < MAX_PAD_LENGTH:
 
         pad_width = (
 
-            max_length
+            MAX_PAD_LENGTH
 
-            - mfcc.shape[1]
+            - combined_features.shape[1]
         )
 
-        mfcc = np.pad(
+        combined_features = np.pad(
 
-            mfcc,
+            combined_features,
 
-            ((0, 0), (0, pad_width))
+            ((0, 0), (0, pad_width)),
+
+            mode="constant"
         )
 
     else:
 
-        mfcc = mfcc[
+        combined_features = combined_features[
             :,
-            :max_length
+            :MAX_PAD_LENGTH
         ]
 
-    return mfcc.T
+    return combined_features.T
