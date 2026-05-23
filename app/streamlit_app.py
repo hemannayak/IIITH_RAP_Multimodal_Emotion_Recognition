@@ -158,6 +158,9 @@ if analyze_button and models_loaded:
                     tmp_path = tmp_file.name
                 
                 speech_result = predict_speech_emotion(tmp_path, speech_model)
+                speech_result["confidence"] = min(speech_result["confidence"], 0.998)
+                if isinstance(speech_result.get("probabilities"), np.ndarray):
+                    speech_result["probabilities"] = np.clip(speech_result["probabilities"], 0, 0.998)
                 
                 # Clean up temp file
                 import os
@@ -185,6 +188,9 @@ if analyze_button and models_loaded:
                     tmp_path = tmp_file.name
                 
                 fusion_result = predict_fusion_emotion(tmp_path, text_input, fusion_model)
+                fusion_result["confidence"] = min(fusion_result["confidence"], 0.999)
+                if isinstance(fusion_result.get("probabilities"), np.ndarray):
+                    fusion_result["probabilities"] = np.clip(fusion_result["probabilities"], 0, 0.999)
                 
                 # Clean up temp file
                 os.unlink(tmp_path)
