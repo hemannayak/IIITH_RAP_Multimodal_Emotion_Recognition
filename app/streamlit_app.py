@@ -413,13 +413,19 @@ if analyze_button and models_loaded:
             if result_to_show and "probabilities" in result_to_show:
                 probs = result_to_show["probabilities"]
                 
-                for emotion, prob in probs.items():
-                    col_a, col_b = st.columns([1, 4])
-                    with col_a:
-                        st.write(f"{emotion.replace('_', ' ').title()}")
-                    with col_b:
-                        st.progress(float(prob))
-                        st.caption(f"{prob:.1%}")
+                # Define emotion labels
+                emotion_labels = ["angry", "disgust", "fear", "happy", "neutral", "pleasant_surprise", "sad"]
+                
+                # Handle numpy array
+                if isinstance(probs, np.ndarray):
+                    probs = probs.flatten()
+                    for i, emotion in enumerate(emotion_labels):
+                        col_a, col_b = st.columns([1, 4])
+                        with col_a:
+                            st.write(f"{emotion.replace('_', ' ').title()}")
+                        with col_b:
+                            st.progress(float(probs[i]))
+                            st.caption(f"{probs[i]:.1%}")
         
         st.markdown("</div>", unsafe_allow_html=True)
         
