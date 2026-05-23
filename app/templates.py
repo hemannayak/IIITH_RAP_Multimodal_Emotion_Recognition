@@ -5,8 +5,8 @@ Extracted to a separate file to prevent linter false-positives from inline HTML/
 
 HERO_SECTION = (
     "<div style='text-align: center; padding: 4rem 0 2rem 0; animation: fadeInDown 1s ease-out;'>"
-    "<h1 style='font-size: 4rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.05em; background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0px 4px 15px rgba(245, 158, 11, 0.4));'>"
-    "🎙️ Multimodal Emotion Recognition"
+    "<h1 style='font-size: 4rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.05em; filter: drop-shadow(0px 4px 15px rgba(245, 158, 11, 0.4));'>"
+    "🎙️ <span style='background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Multimodal Emotion Recognition</span>"
     "</h1>"
     "<p style='color: #E2E8F0; font-size: 1.35rem; font-weight: 600; margin-bottom: 2.5rem; letter-spacing: 0.08em; text-transform: uppercase;'>"
     "Speech &nbsp;·&nbsp; Text &nbsp;·&nbsp; Multimodal Fusion"
