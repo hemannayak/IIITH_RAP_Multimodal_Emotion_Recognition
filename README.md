@@ -135,6 +135,29 @@ The project includes comprehensive visualizations:
 - **PCA Plots:** Linear projection with variance explained
 - **Classification Reports:** Per-emotion precision, recall, F1-score
 
+#### Example Visual Outputs
+
+**Speech model clusters**
+
+![Speech t-SNE](Results/visualizations/speech_tsne.png)
+![Speech PCA](Results/visualizations/speech_pca.png)
+
+**Text model clusters**
+
+![Text t-SNE](Results/visualizations/text_tsne.png)
+![Text PCA](Results/visualizations/text_pca.png)
+
+**Fusion model clusters**
+
+![Fusion t-SNE](Results/visualizations/fusion_tsne.png)
+![Fusion PCA](Results/visualizations/fusion_pca.png)
+
+**Confusion matrices**
+
+![Speech Confusion Matrix](Results/evaluation/speech_confusion_matrix.png)
+![Text Confusion Matrix](Results/evaluation/text_confusion_matrix.png)
+![Fusion Confusion Matrix](Results/evaluation/fusion_confusion_matrix.png)
+
 ## 🔬 Key Findings
 
 1. **Speech is the dominant modality** for emotion recognition in TESS
