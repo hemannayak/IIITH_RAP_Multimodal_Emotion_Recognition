@@ -197,6 +197,9 @@ if analyze_button and models_loaded:
         with st.spinner("Analyzing text..."):
             try:
                 text_result = predict_text_emotion(text_input, text_model)
+                text_result["confidence"] = min(text_result["confidence"], 0.998)
+                if isinstance(text_result.get("probabilities"), np.ndarray):
+                    text_result["probabilities"] = np.clip(text_result["probabilities"], 0, 0.998)
             except Exception as e:
                 st.error(f"Text analysis error: {e}")
     
@@ -212,9 +215,18 @@ if analyze_button and models_loaded:
                     tmp_path = tmp_file.name
                 
                 fusion_result = predict_fusion_emotion(tmp_path, text_input, fusion_model)
-                fusion_result["confidence"] = min(fusion_result["confidence"], 0.999)
+                fusion_result["confidence"] = min(fusion_result["confidence"], 0.998)
                 if isinstance(fusion_result.get("probabilities"), np.ndarray):
-                    fusion_result["probabilities"] = np.clip(fusion_result["probabilities"], 0, 0.999)
+                    fusion_result["probabilities"] = np.clip(fusion_result["probabilities"], 0, 0.998)
+
+                if speech_result and text_result:
+                    fusion_result["multimodal_confidence"] = (
+                        0.6 * fusion_result["confidence"]
+                        + 0.2 * speech_result["confidence"]
+                        + 0.2 * text_result["confidence"]
+                    )
+                else:
+                    fusion_result["multimodal_confidence"] = fusion_result["confidence"]
                 
                 # Clean up temp file
                 os.unlink(tmp_path)
@@ -235,7 +247,16 @@ if analyze_button and models_loaded:
                 confidence = speech_result["confidence"]
                 emoji = EMOTION_EMOJIS.get(emotion, "🎭")
                 
-                st.markdown(prediction_card(emoji, emotion, confidence, "Speech Model"), unsafe_allow_html=True)
+                st.markdown(
+                    prediction_card(
+                        emoji,
+                        emotion,
+                        confidence,
+                        "Speech Model",
+                        probabilities=speech_result.get("probabilities")
+                    ),
+                    unsafe_allow_html=True,
+                )
             else:
                 st.info("No audio provided")
         
@@ -246,7 +267,16 @@ if analyze_button and models_loaded:
                 confidence = text_result["confidence"]
                 emoji = EMOTION_EMOJIS.get(emotion, "🎭")
                 
-                st.markdown(prediction_card(emoji, emotion, confidence, "Text Model"), unsafe_allow_html=True)
+                st.markdown(
+                    prediction_card(
+                        emoji,
+                        emotion,
+                        confidence,
+                        "Text Model",
+                        probabilities=text_result.get("probabilities")
+                    ),
+                    unsafe_allow_html=True,
+                )
             else:
                 st.info("No text provided")
         
@@ -256,8 +286,20 @@ if analyze_button and models_loaded:
                 emotion = fusion_result["emotion"]
                 confidence = fusion_result["confidence"]
                 emoji = EMOTION_EMOJIS.get(emotion, "🎭")
+                extra_text = f"Multimodal score: {fusion_result.get('multimodal_confidence', confidence):.1%}"
                 
-                st.markdown(prediction_card(emoji, emotion, confidence, "Fusion Model", is_fusion=True), unsafe_allow_html=True)
+                st.markdown(
+                    prediction_card(
+                        emoji,
+                        emotion,
+                        confidence,
+                        "Fusion Model",
+                        is_fusion=True,
+                        probabilities=fusion_result.get("probabilities"),
+                        extra_text=extra_text,
+                    ),
+                    unsafe_allow_html=True,
+                )
             else:
                 st.info("Provide both audio and text")
         

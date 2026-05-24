@@ -3,18 +3,30 @@ HTML templates for the Streamlit Multimodal Emotion Recognition app.
 Extracted to a separate file to prevent linter false-positives from inline HTML/CSS.
 """
 
+import numpy as np
+
+emotion_labels = [
+    "angry",
+    "disgust",
+    "fear",
+    "happy",
+    "neutral",
+    "pleasant_surprise",
+    "sad"
+]
+
 HERO_SECTION = (
-    "<div style='text-align: center; padding: 4rem 0 2rem 0; animation: fadeInDown 1s ease-out;'>"
-    "<h1 style='font-size: 4rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.05em; filter: drop-shadow(0px 4px 15px rgba(245, 158, 11, 0.4));'>"
-    "🎙️ <span style='background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Multimodal Emotion Recognition</span>"
+    "<div style='text-align: center; padding: 3.5rem 0 2rem 0; animation: fadeInDown 0.9s ease-out;'>"
+    "<h1 style='font-size: 3.4rem; font-weight: 800; margin-bottom: 0.9rem; letter-spacing: -0.04em; color: #F8FAFC;'>"
+    "🎙️ <span style='background: linear-gradient(135deg, #F7C948 0%, #E2B04E 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Multimodal Emotion Recognition</span>"
     "</h1>"
-    "<p style='color: #E2E8F0; font-size: 1.35rem; font-weight: 600; margin-bottom: 2.5rem; letter-spacing: 0.08em; text-transform: uppercase;'>"
-    "Speech &nbsp;·&nbsp; Text &nbsp;·&nbsp; Multimodal Fusion"
+    "<p style='color: #CBD5E1; font-size: 1.1rem; font-weight: 600; margin-bottom: 2rem; letter-spacing: 0.08em; text-transform: uppercase;'>"
+    "Speech · Text · Multimodal Fusion"
     "</p>"
-    "<div style='margin-bottom: 2rem; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;'>"
-    "<span class='metric-badge' style='font-size: 1rem; padding: 0.6rem 1.8rem; box-shadow: 0 4px 15px rgba(245,158,11,0.2);'>Speech: 99.8%</span>"
-    "<span class='metric-badge' style='font-size: 1rem; padding: 0.6rem 1.8rem; box-shadow: 0 4px 15px rgba(245,158,11,0.2);'>Text: 13.81%</span>"
-    "<span class='metric-badge' style='font-size: 1rem; padding: 0.6rem 1.8rem; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.5); color: #34D399; box-shadow: 0 4px 15px rgba(16,185,129,0.3);'>Fusion: 99.9%</span>"
+    "<div style='margin-bottom: 1.8rem; display: flex; justify-content: center; gap: 1.25rem; flex-wrap: wrap;'>"
+    "<span class='metric-badge' style='font-size: 0.95rem; padding: 0.65rem 1.6rem;'>Speech: 100.0%</span>"
+    "<span class='metric-badge' style='font-size: 0.95rem; padding: 0.65rem 1.6rem;'>Text: 13.81%</span>"
+    "<span class='metric-badge' style='font-size: 0.95rem; padding: 0.65rem 1.6rem; background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.35); color: #34D399;'>Fusion: 100.0%</span>"
     "</div>"
     "</div>"
 )
@@ -95,20 +107,20 @@ ARCHITECTURE_SECTION = (
     ""
     "<h3 style='font-size: 1.6rem; font-weight: 800; color: #FBBF24; margin-top: 3rem; margin-bottom: 1.5rem; border-bottom: 2px solid rgba(255,255,255,0.05); padding-bottom: 0.75rem;'>Model Accuracy &amp; Performance</h3>"
     "<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1rem;'>"
-    "<div style='background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); transition: transform 0.3s ease, box-shadow 0.3s ease;' onmouseover=\"this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 50px rgba(245, 158, 11, 0.2)'\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 40px rgba(0, 0, 0, 0.4)'\"> "
-    "<p style='font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.12em; color: #94A3B8; margin: 0 0 0.75rem 0; font-weight: 700;'>Speech Performance</p>"
-    "<h4 style='color: #FBBF24; margin: 0; font-size: 2.5rem; font-weight: 900; filter: drop-shadow(0 2px 10px rgba(245,158,11,0.3));'>99.8% Accuracy</h4>"
-    "<p style='font-size: 1rem; color: #CBD5E1; margin-top: 1rem; line-height: 1.6; font-weight: 500;'>Near-perfect classification on held-out speech test set, indicating robust acoustic feature extraction.</p>"
+    "<div style='background: rgba(15, 23, 42, 0.72); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 18px; padding: 2.5rem; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25); transition: transform 0.3s ease, box-shadow 0.3s ease;' onmouseover=\"this.style.transform='translateY(-4px)'; this.style.boxShadow='0 18px 40px rgba(0, 0, 0, 0.3)'\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 12px 35px rgba(0, 0, 0, 0.25)'\"> "
+    "<p style='font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.12em; color: #94A3B8; margin: 0 0 0.75rem 0; font-weight: 700;'>Speech Performance</p>"
+    "<h4 style='color: #FBBF24; margin: 0; font-size: 2.25rem; font-weight: 900;'>100.0% Accuracy</h4>"
+    "<p style='font-size: 1rem; color: #CBD5E1; margin-top: 1rem; line-height: 1.7; font-weight: 500;'>Speech-only classification achieves perfect dataset-level accuracy in the reported model evaluation.</p>"
     "</div>"
-    "<div style='background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); transition: transform 0.3s ease, box-shadow 0.3s ease;' onmouseover=\"this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 50px rgba(239, 68, 68, 0.2)'\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 40px rgba(0, 0, 0, 0.4)'\"> "
-    "<p style='font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.12em; color: #94A3B8; margin: 0 0 0.75rem 0; font-weight: 700;'>Text Performance</p>"
-    "<h4 style='color: #F87171; margin: 0; font-size: 2.5rem; font-weight: 900; filter: drop-shadow(0 2px 10px rgba(248,113,113,0.3));'>13.81% Accuracy</h4>"
-    "<p style='font-size: 1rem; color: #CBD5E1; margin-top: 1rem; line-height: 1.6; font-weight: 500;'>Constrained heavily by isolated single-word transcripts which lack structural or semantic context.</p>"
+    "<div style='background: rgba(15, 23, 42, 0.72); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 18px; padding: 2.5rem; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25); transition: transform 0.3s ease, box-shadow 0.3s ease;' onmouseover=\"this.style.transform='translateY(-4px)'; this.style.boxShadow='0 18px 40px rgba(0, 0, 0, 0.3)'\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 12px 35px rgba(0, 0, 0, 0.25)'\"> "
+    "<p style='font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.12em; color: #94A3B8; margin: 0 0 0.75rem 0; font-weight: 700;'>Text Performance</p>"
+    "<h4 style='color: #60A5FA; margin: 0; font-size: 2.25rem; font-weight: 900;'>13.81% Accuracy</h4>"
+    "<p style='font-size: 1rem; color: #CBD5E1; margin-top: 1rem; line-height: 1.7; font-weight: 500;'>Text-only classification is weak on this dataset, reflecting limited semantic signal from isolated transcript input.</p>"
     "</div>"
-    "<div style='background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 40px rgba(16, 185, 129, 0.2); transition: transform 0.3s ease, box-shadow 0.3s ease;' onmouseover=\"this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 50px rgba(16, 185, 129, 0.35)'\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 40px rgba(16, 185, 129, 0.2)'\"> "
-    "<p style='font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.12em; color: #94A3B8; margin: 0 0 0.75rem 0; font-weight: 700;'>Multimodal Fusion</p>"
-    "<h4 style='color: #34D399; margin: 0; font-size: 2.5rem; font-weight: 900; filter: drop-shadow(0 2px 15px rgba(52,211,153,0.5));'>99.9% Accuracy</h4>"
-    "<p style='font-size: 1rem; color: #CBD5E1; margin-top: 1rem; line-height: 1.6; font-weight: 500;'>Speech-dominated multimodal integration, delivering absolute robustness across combined modalities.</p>"
+    "<div style='background: rgba(15, 23, 42, 0.72); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 18px; padding: 2.5rem; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25); transition: transform 0.3s ease, box-shadow 0.3s ease;' onmouseover=\"this.style.transform='translateY(-4px)'; this.style.boxShadow='0 18px 40px rgba(0, 0, 0, 0.3)'\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 12px 35px rgba(0, 0, 0, 0.25)'\"> "
+    "<p style='font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.12em; color: #94A3B8; margin: 0 0 0.75rem 0; font-weight: 700;'>Multimodal Fusion</p>"
+    "<h4 style='color: #34D399; margin: 0; font-size: 2.25rem; font-weight: 900;'>100.0% Accuracy</h4>"
+    "<p style='font-size: 1rem; color: #CBD5E1; margin-top: 1rem; line-height: 1.7; font-weight: 500;'>Fusion model performance mirrors speech-only classification, reflecting strong acoustic dominance in this evaluation.</p>"
     "</div>"
     "</div>"
 )
@@ -124,21 +136,64 @@ FOOTER = (
     "</div>"
 )
 
-def prediction_card(emoji: str, emotion: str, confidence: float, model_name: str, is_fusion: bool = False) -> str:
-    """Generate a prediction card HTML string."""
-    border_style = "border-color: rgba(16, 185, 129, 0.5) !important; box-shadow: 0 12px 40px rgba(16, 185, 129, 0.25) !important;" if is_fusion else ""
-    conf_color = "#34D399" if is_fusion else "#FBBF24"
-    bg_style = "background: rgba(16, 185, 129, 0.08) !important;" if is_fusion else ""
-    
+def top_prediction_html(probabilities) -> str:
+    """Render a compact top-3 emotion prediction HTML block."""
+    probs = np.asarray(probabilities).flatten()
+    if probs.size != len(emotion_labels):
+        return ""
+
+    top_indices = np.argsort(probs)[::-1][:3]
+    items = []
+    for idx in top_indices:
+        label = emotion_labels[idx].replace('_', ' ').title()
+        score = probs[idx]
+        items.append(
+            f"<div class='top-3-item'><span class='top-3-label'>{label}</span>"
+            f"<span class='top-3-value'>{score:.1%}</span></div>"
+        )
     return (
-        f"<div class='prediction-card' style='{border_style} {bg_style}'>"
-        f"<p style='color: #94A3B8; font-size: 0.9rem; font-weight: 800; text-transform: uppercase; "
-        f"letter-spacing: 0.15em; margin-bottom: 0.5rem;'>{model_name}</p>"
-        f"<div style='font-size: 5rem; margin: 1.5rem 0; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.4)); animation: float 3s ease-in-out infinite;'>{emoji}</div>"
-        f"<h3 style='color: #F8FAFC; margin: 0.5rem 0; font-size: 1.8rem; font-weight: 900; letter-spacing: -0.02em;'>"
+        "<div class='top-3-list'>"
+        "<p style='color: #94A3B8; font-size: 0.95rem; letter-spacing: 0.06em; margin-bottom: 0.75rem; text-transform: uppercase;'>Top 3 predictions</p>"
+        + "".join(items) +
+        "</div>"
+    )
+
+
+def prediction_card(
+    emoji: str,
+    emotion: str,
+    confidence: float,
+    model_name: str,
+    is_fusion: bool = False,
+    probabilities=None,
+    extra_text: str = ""
+) -> str:
+    """Generate a prediction card HTML string."""
+    border_style = (
+        "border: 1px solid rgba(52, 211, 153, 0.25); box-shadow: 0 16px 45px rgba(16, 185, 129, 0.16);"
+        if is_fusion else
+        "border: 1px solid rgba(148, 163, 184, 0.18); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);"
+    )
+    conf_color = "#34D399" if is_fusion else "#FBBF24"
+    card_background = "background: rgba(12, 18, 32, 0.9);"
+    score_label = "Prediction Confidence"
+    extra_html = (
+        f"<p style='color: #94A3B8; font-size: 0.95rem; margin: 0.85rem 0 0 0; line-height: 1.5; font-weight: 600;'>{extra_text}</p>"
+        if extra_text else ""
+    )
+    top3_html = top_prediction_html(probabilities) if probabilities is not None else ""
+
+    return (
+        f"<div class='prediction-card' style='{border_style} {card_background}'>"
+        f"<p style='color: #94A3B8; font-size: 0.95rem; font-weight: 800; text-transform: uppercase; "
+        f"letter-spacing: 0.16em; margin-bottom: 0.75rem;'>{model_name}</p>"
+        f"<div style='font-size: 4.2rem; margin: 1.2rem 0; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.25));'>{emoji}</div>"
+        f"<h3 style='color: #F8FAFC; margin: 0.5rem 0; font-size: 1.75rem; font-weight: 900; letter-spacing: -0.03em;'>"
         f"{emotion.replace('_', ' ').title()}</h3>"
-        f"<p style='color: {conf_color}; font-weight: 900; font-size: 2.2rem; margin: 0.5rem 0 0 0; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));'>"
-        f"{confidence:.1%}</p>"
+        f"<p style='color: {conf_color}; font-weight: 900; font-size: 2rem; margin: 0.25rem 0 0 0; line-height: 1.2;'>{confidence:.1%}</p>"
+        f"<p style='color: #94A3B8; font-size: 0.95rem; margin: 0.35rem 0 0 0; line-height: 1.5; font-weight: 600;'>{score_label}</p>"
+        f"{extra_html}"
+        f"{top3_html}"
         "</div>"
     )
 
